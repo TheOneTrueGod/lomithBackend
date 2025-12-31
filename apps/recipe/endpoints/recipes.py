@@ -27,8 +27,6 @@ def list_or_create(request):
         return create(request)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_list(request):
     """
     Get a paginated list of recipes with optional filtering.
@@ -95,8 +93,6 @@ def get_list(request):
         )
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_by_id(request, recipe_id):
     """
     Get a recipe by its ID.
@@ -138,8 +134,6 @@ def get_by_id(request, recipe_id):
         )
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def create(request):
     """
     Create a new recipe.
@@ -191,8 +185,6 @@ def detail_update_delete(request, recipe_id):
         return delete(request, recipe_id)
 
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
 def update(request, recipe_id):
     """
     Update an existing recipe.
@@ -227,8 +219,6 @@ def update(request, recipe_id):
         )
 
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
 def delete(request, recipe_id):
     """
     Delete a recipe by its ID.
