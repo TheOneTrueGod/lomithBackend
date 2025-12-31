@@ -6,8 +6,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from api.services.recipes_service import RecipesService
-from api.repositories.mocked_recipes_repository import MockedRecipesRepository
+from apps.recipe.services.recipes_service import RecipesService
+from apps.recipe.repositories.mocked_recipes_repository import MockedRecipesRepository
 
 
 # Initialize service with mocked repository

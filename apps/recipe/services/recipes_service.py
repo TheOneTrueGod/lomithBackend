@@ -3,7 +3,7 @@ Service layer for recipe business logic.
 Handles filtering, pagination, formatting, and data transformation.
 """
 from typing import List, Dict, Optional, Literal
-from api.repositories.recipes_repository import RecipesRepository
+from apps.recipe.repositories.recipes_repository import RecipesRepository
 from db.mocked.recipes import Recipe
 
 

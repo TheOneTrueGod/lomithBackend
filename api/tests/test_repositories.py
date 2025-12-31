@@ -2,7 +2,7 @@
 Tests for the recipes repository layer.
 """
 from django.test import TestCase
-from api.repositories.mocked_recipes_repository import MockedRecipesRepository
+from apps.recipe.repositories.mocked_recipes_repository import MockedRecipesRepository
 
 
 class MockedRecipesRepositoryTest(TestCase):

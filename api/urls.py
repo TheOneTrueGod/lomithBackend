@@ -1,5 +1,6 @@
 from django.urls import path
-from .endpoints import test, login, protected, recipes
+from .endpoints import test, login, protected
+from apps.recipe.endpoints import recipes
 
 urlpatterns = [
     path('test/', test.test_endpoint, name='test'),

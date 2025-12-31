@@ -4,8 +4,8 @@ Tests for the recipes service layer.
 
 from django.test import TestCase
 from unittest.mock import Mock, MagicMock
-from api.services.recipes_service import RecipesService
-from api.repositories.recipes_repository import RecipesRepository
+from apps.recipe.services.recipes_service import RecipesService
+from apps.recipe.repositories.recipes_repository import RecipesRepository
 from db.mocked.recipes import Recipe
 
 
