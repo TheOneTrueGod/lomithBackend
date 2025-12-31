@@ -15,6 +15,18 @@ from apps.recipe.repositories.mocked_recipes_repository import MockedRecipesRepo
 _recipes_service = RecipesService(MockedRecipesRepository())
 
 
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def list_or_create(request):
+    """
+    Handle GET (list) or POST (create) requests for recipes.
+    """
+    if request.method == 'GET':
+        return get_list(request)
+    elif request.method == 'POST':
+        return create(request)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list(request):
@@ -82,3 +94,167 @@ def get_list(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_by_id(request, recipe_id):
+    """
+    Get a recipe by its ID.
+    
+    Path Parameters:
+        - recipe_id (str): The ID of the recipe to retrieve
+    
+    Query Parameters:
+        - detail_level (str): 'simple' or 'detailed' (default: 'detailed')
+            - 'simple': Excludes ingredients and steps
+            - 'detailed': Includes all recipe fields
+    
+    Returns:
+        Response with recipe data or 404 if not found
+    """
+    try:
+        detail_level = request.query_params.get('detail_level', 'detailed')
+        
+        if detail_level not in ['simple', 'detailed']:
+            return Response(
+                {'error': "detail_level must be 'simple' or 'detailed'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        recipe = _recipes_service.get_by_id(recipe_id, detail_level=detail_level)
+        
+        if recipe:
+            return Response(recipe, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {'error': 'Recipe not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    except Exception as e:
+        return Response(
+            {'error': f'An error occurred: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create(request):
+    """
+    Create a new recipe.
+    
+    Request Body:
+        - All required recipe fields (id, userId, title, description, etc.)
+    
+    Returns:
+        Response with created recipe data or 400 if validation fails
+    """
+    try:
+        recipe_data = request.data
+        
+        # Validate required fields
+        required_fields = ['id', 'userId', 'title', 'description', 'prepTime', 
+                          'cookTime', 'servings', 'imageUrl', 'ingredients', 
+                          'steps', 'tags', 'createdAt', 'updatedAt']
+        
+        missing_fields = [field for field in required_fields if field not in recipe_data]
+        if missing_fields:
+            return Response(
+                {'error': f'Missing required fields: {", ".join(missing_fields)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create recipe
+        created_recipe = _recipes_service.create(recipe_data)
+        
+        return Response(created_recipe, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        return Response(
+            {'error': f'An error occurred: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def detail_update_delete(request, recipe_id):
+    """
+    Handle GET (detail), PUT (update), or DELETE requests for a specific recipe.
+    """
+    if request.method == 'GET':
+        return get_by_id(request, recipe_id)
+    elif request.method == 'PUT':
+        return update(request, recipe_id)
+    elif request.method == 'DELETE':
+        return delete(request, recipe_id)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update(request, recipe_id):
+    """
+    Update an existing recipe.
+    
+    Path Parameters:
+        - recipe_id (str): The ID of the recipe to update
+    
+    Request Body:
+        - Fields to update (partial updates supported)
+    
+    Returns:
+        Response with updated recipe data or 404 if not found
+    """
+    try:
+        recipe_data = request.data
+        
+        # Update recipe
+        updated_recipe = _recipes_service.update(recipe_id, recipe_data)
+        
+        if updated_recipe:
+            return Response(updated_recipe, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {'error': 'Recipe not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    except Exception as e:
+        return Response(
+            {'error': f'An error occurred: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete(request, recipe_id):
+    """
+    Delete a recipe by its ID.
+    
+    Path Parameters:
+        - recipe_id (str): The ID of the recipe to delete
+    
+    Returns:
+        Response with success message or 404 if not found
+    """
+    try:
+        deleted = _recipes_service.delete(recipe_id)
+        
+        if deleted:
+            return Response(
+                {'message': 'Recipe deleted successfully'},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {'error': 'Recipe not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    except Exception as e:
+        return Response(
+            {'error': f'An error occurred: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

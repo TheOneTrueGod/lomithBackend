@@ -32,4 +32,57 @@ class RecipesRepository(ABC):
             Tuple[List[Recipe], int]: (paginated recipes, total count before pagination)
         """
         pass
+    
+    @abstractmethod
+    def get_by_id(self, recipe_id: str) -> Optional[Recipe]:
+        """
+        Retrieve a recipe by its ID.
+        
+        Args:
+            recipe_id: The ID of the recipe to retrieve
+            
+        Returns:
+            Recipe if found, None otherwise
+        """
+        pass
+    
+    @abstractmethod
+    def create(self, recipe: Recipe) -> Recipe:
+        """
+        Create a new recipe.
+        
+        Args:
+            recipe: The recipe data to create (must include all required fields)
+            
+        Returns:
+            The created recipe
+        """
+        pass
+    
+    @abstractmethod
+    def update(self, recipe_id: str, recipe_data: Recipe) -> Optional[Recipe]:
+        """
+        Update an existing recipe.
+        
+        Args:
+            recipe_id: The ID of the recipe to update
+            recipe_data: The updated recipe data
+            
+        Returns:
+            The updated recipe if found, None otherwise
+        """
+        pass
+    
+    @abstractmethod
+    def delete(self, recipe_id: str) -> bool:
+        """
+        Delete a recipe by its ID.
+        
+        Args:
+            recipe_id: The ID of the recipe to delete
+            
+        Returns:
+            True if the recipe was deleted, False if not found
+        """
+        pass
 

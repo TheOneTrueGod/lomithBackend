@@ -1,6 +1,7 @@
 """
 Mocked implementation of RecipesRepository using in-memory data.
 """
+import copy
 from typing import List, Optional, Tuple
 from db.mocked.recipes import Recipe, mock_recipes
 from .recipes_repository import RecipesRepository
@@ -11,6 +12,8 @@ class MockedRecipesRepository(RecipesRepository):
     
     def __init__(self):
         """Initialize with mocked recipe data."""
+        # Store a reference to the original mock_recipes
+        # We'll make copies when needed for modifications
         self._recipes = mock_recipes
     
     def get_list(
@@ -24,7 +27,7 @@ class MockedRecipesRepository(RecipesRepository):
         Retrieve a paginated list of recipes with optional filtering.
         All filtering, searching, and pagination is handled in one pass.
         """
-        # Start with all recipes
+        # Start with all recipes (shallow copy is fine for read operations)
         filtered_recipes = self._recipes.copy()
         
         # Apply user_id filter if provided
@@ -66,5 +69,56 @@ class MockedRecipesRepository(RecipesRepository):
         end_index = start_index + page_size
         paginated_recipes = filtered_recipes[start_index:end_index]
         
-        return paginated_recipes, total
+        # Return deep copies to prevent modifications to the original recipes
+        return [copy.deepcopy(recipe) for recipe in paginated_recipes], total
+    
+    def get_by_id(self, recipe_id: str) -> Optional[Recipe]:
+        """
+        Retrieve a recipe by its ID.
+        Returns a deep copy of the recipe to prevent modifications to the original.
+        """
+        for recipe in self._recipes:
+            if recipe.get('id') == recipe_id:
+                # Return a deep copy to prevent modifications to the original
+                return copy.deepcopy(recipe)
+        return None
+    
+    def create(self, recipe: Recipe) -> Recipe:
+        """
+        Create a new recipe.
+        Makes a deep copy of the provided recipe and adds it to the list.
+        """
+        # Make a deep copy to avoid modifying the original
+        new_recipe = copy.deepcopy(recipe)
+        # Add to the recipes list
+        self._recipes.append(new_recipe)
+        # Return a deep copy of what was added
+        return copy.deepcopy(new_recipe)
+    
+    def update(self, recipe_id: str, recipe_data: Recipe) -> Optional[Recipe]:
+        """
+        Update an existing recipe.
+        Finds the recipe, makes a deep copy, applies updates, and returns the modified copy.
+        """
+        for i, recipe in enumerate(self._recipes):
+            if recipe.get('id') == recipe_id:
+                # Make a deep copy of the original recipe
+                updated_recipe = copy.deepcopy(recipe)
+                # Apply updates from recipe_data
+                updated_recipe.update(recipe_data)
+                # Update the recipe in the list
+                self._recipes[i] = updated_recipe
+                # Return a deep copy of the updated recipe
+                return copy.deepcopy(updated_recipe)
+        return None
+    
+    def delete(self, recipe_id: str) -> bool:
+        """
+        Delete a recipe by its ID.
+        """
+        for i, recipe in enumerate(self._recipes):
+            if recipe.get('id') == recipe_id:
+                del self._recipes[i]
+                return True
+        return False
 

@@ -97,4 +97,62 @@ class RecipesService:
             formatted = recipe.copy()
         
         return formatted
+    
+    def get_by_id(self, recipe_id: str, detail_level: Literal['simple', 'detailed'] = 'detailed') -> Optional[Dict]:
+        """
+        Get a recipe by its ID.
+        
+        Args:
+            recipe_id: The ID of the recipe to retrieve
+            detail_level: 'simple' excludes ingredients and steps, 'detailed' includes all fields
+            
+        Returns:
+            Formatted recipe dictionary if found, None otherwise
+        """
+        recipe = self.repository.get_by_id(recipe_id)
+        if recipe:
+            return self._format_recipe(recipe, detail_level)
+        return None
+    
+    def create(self, recipe_data: Dict) -> Dict:
+        """
+        Create a new recipe.
+        
+        Args:
+            recipe_data: Dictionary containing recipe data (must include all required fields)
+            
+        Returns:
+            The created recipe dictionary
+        """
+        # Convert dict to Recipe type (type checking will be handled by repository)
+        recipe = self.repository.create(recipe_data)
+        return self._format_recipe(recipe, 'detailed')
+    
+    def update(self, recipe_id: str, recipe_data: Dict) -> Optional[Dict]:
+        """
+        Update an existing recipe.
+        
+        Args:
+            recipe_id: The ID of the recipe to update
+            recipe_data: Dictionary containing updated recipe fields
+            
+        Returns:
+            The updated recipe dictionary if found, None otherwise
+        """
+        recipe = self.repository.update(recipe_id, recipe_data)
+        if recipe:
+            return self._format_recipe(recipe, 'detailed')
+        return None
+    
+    def delete(self, recipe_id: str) -> bool:
+        """
+        Delete a recipe by its ID.
+        
+        Args:
+            recipe_id: The ID of the recipe to delete
+            
+        Returns:
+            True if the recipe was deleted, False if not found
+        """
+        return self.repository.delete(recipe_id)
 

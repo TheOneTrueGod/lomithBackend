@@ -2,7 +2,8 @@
 
 ## Overview
 
-This is a Django REST Framework backend API with JWT authentication. The API provides three endpoints: a test endpoint, a login endpoint, and a protected endpoint that requires authentication.
+This is a Django REST Framework backend API with JWT authentication.
+It supports multiple different frontend applications, and each application is separated into its own folder in the "apps" directory.
 
 ## Project Structure
 
@@ -12,15 +13,19 @@ Djangotest/
 │   ├── settings.py      # Django settings with REST framework and JWT config
 │   ├── urls.py          # Main URL routing
 │   └── ...
-├── api/                  # API application
-│   ├── views.py         # API endpoint views
-│   ├── urls.py          # API URL routing
-│   └── ...
+├── apps/                # Application details
+│   ├── auth						 # Authentication related endpoints.  Reused in multiple applications.
+│   └── recipes          # A recipe app
 ├── manage.py            # Django management script
 ├── requirements.txt     # Python dependencies
 ├── setup.ps1            # Initial setup script
 └── init_db.ps1           # Database initialization script
 ```
+
+## Common AI Tasks
+If you are asked to create or modify an <endpoint>.md file for an API endpoint, ignore the rest of this file and read `instructions/endpointDef.md` for more instructions.
+
+If you are asked to create or modify an endpoint called <endpoint>.py, after you are done, please update the corresponding <endpoint>.md file using the instructions in `instructions/endpointDef.md`.
 
 ## Setup Instructions
 
