@@ -7,23 +7,37 @@ from django.contrib.auth.models import User
 # Demo user credentials
 DEMO_EMAIL = "john@example.com"
 DEMO_PASSWORD = "password123"
-DEMO_ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NzY4MDAwLCJpYXQiOjE3MzU2ODE2MDAsImp0aSI6IjEyMzQ1Njc4OTAiLCJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImpvaG4ifQ.demo_signature"
 
 
 @api_view(["POST"])
 def login_endpoint(request):
     """
     Login endpoint that returns an access token valid for 24 hours.
-    Accepts demo user credentials and returns hardcoded token.
+    Accepts demo user credentials and returns a real JWT token.
     """
     username = request.data.get("username", "")
     password = request.data.get("password", "")
 
     # Check if credentials match demo user
     if username == DEMO_EMAIL and password == DEMO_PASSWORD:
+        # Get or create demo user for token generation
+        try:
+            demo_user = User.objects.get(username="john")
+        except User.DoesNotExist:
+            # Create demo user if it doesn't exist
+            demo_user = User.objects.create_user(
+                username="john",
+                email=DEMO_EMAIL,
+                password=DEMO_PASSWORD
+            )
+        
+        # Generate real JWT token (valid for 24 hours as configured)
+        refresh = RefreshToken.for_user(demo_user)
+        access_token = str(refresh.access_token)
+        
         return Response(
             {
-                "access_token": DEMO_ACCESS_TOKEN,
+                "access_token": access_token,
                 "token_type": "Bearer",
                 "expires_in": 86400,  # 24 hours in seconds
             },
