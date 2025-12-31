@@ -7,12 +7,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from apps.recipe.services.recipes_service import RecipesService
-from apps.recipe.repositories.mocked_recipes_repository import MockedRecipesRepository
+from apps.recipe.repositories.database_recipes_repository import DatabaseRecipesRepository
 
 
-# Initialize service with mocked repository
-# In the future, this can be swapped for a database repository
-_recipes_service = RecipesService(MockedRecipesRepository())
+# Initialize service with database repository
+_recipes_service = RecipesService(DatabaseRecipesRepository())
 
 
 @api_view(['GET', 'POST'])

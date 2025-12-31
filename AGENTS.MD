@@ -8,7 +8,7 @@ It supports multiple different frontend applications, and each application is se
 ## Project Structure
 
 ```
-Djangotest/
+LomithBackend/
 ├── backend/              # Django project configuration
 │   ├── settings.py      # Django settings with REST framework and JWT config
 │   ├── urls.py          # Main URL routing

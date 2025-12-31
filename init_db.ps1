@@ -13,6 +13,11 @@ python manage.py migrate
 Write-Host "Creating test user..." -ForegroundColor Yellow
 python manage.py shell -c "from django.contrib.auth.models import User; User.objects.filter(username='testuser').exists() or User.objects.create_user('testuser', 'test@example.com', 'testpass')"
 
+# Seed recipes from mock data
+Write-Host "Seeding recipes from mock data..." -ForegroundColor Yellow
+python manage.py seed_recipes
+
 Write-Host "Database initialization complete!" -ForegroundColor Green
 Write-Host "Test user created: username='testuser', password='testpass'" -ForegroundColor Cyan
+Write-Host "Recipes seeded from mock data" -ForegroundColor Cyan
 

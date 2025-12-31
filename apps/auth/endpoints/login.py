@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 # Demo user credentials
 DEMO_EMAIL = "john@example.com"
-DEMO_PASSWORD = "password123"
+DEMO_PASSWORD = "T3stUs4rP4ss"
 
 
 @api_view(["POST"])
