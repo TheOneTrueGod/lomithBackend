@@ -13,8 +13,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 
-# Set Django settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+# Don't set Django settings or import Django at module level
+# This avoids issues with Vercel's runtime inspection
 
 # Lazy load Django WSGI application to avoid import-time issues
 _application = None
@@ -23,6 +23,8 @@ def get_application():
     """Lazy load Django WSGI application"""
     global _application
     if _application is None:
+        # Set Django settings before importing
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
         from backend.wsgi import application as app
         _application = app
     return _application
@@ -123,3 +125,4 @@ def handler(request):
         status=response_data['status'],
         headers=response_data['headers']
     )
+
