@@ -4,14 +4,14 @@ from django.utils import timezone
 
 class Recipe(models.Model):
     """Recipe model representing a cooking recipe."""
-    id = models.CharField(max_length=255, primary_key=True)
+    # id is auto-generated as AutoField (primary key)
     userId = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
     description = models.TextField()
     prepTime = models.IntegerField()  # in minutes
     cookTime = models.IntegerField()  # in minutes
     servings = models.IntegerField()
-    imageUrl = models.URLField(max_length=500)
+    imageUrl = models.URLField(max_length=500, blank=True, null=True)
     createdAt = models.DateTimeField(default=timezone.now)
     updatedAt = models.DateTimeField(auto_now=True)
     
@@ -28,7 +28,7 @@ class Recipe(models.Model):
 
 class Ingredient(models.Model):
     """Ingredient model representing an ingredient in a recipe."""
-    id = models.CharField(max_length=255, primary_key=True)
+    # id is auto-generated as AutoField (primary key)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingredients')
     name = models.CharField(max_length=255)
     amount = models.CharField(max_length=100)
@@ -44,7 +44,7 @@ class Ingredient(models.Model):
 
 class Step(models.Model):
     """Step model representing a cooking step in a recipe."""
-    id = models.CharField(max_length=255, primary_key=True)
+    # id is auto-generated as AutoField (primary key)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='steps')
     instructions = models.TextField()
     order = models.IntegerField()  # Order of the step in the recipe
