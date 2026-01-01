@@ -180,5 +180,6 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# For Vercel deployment: vercel.json handles CORS headers at the edge
-# This Django CORS config is a fallback and for local development
+# CORS is handled by Django's corsheaders middleware
+# This allows dynamic origin matching based on the request Origin header
+# vercel.json is kept empty to avoid conflicts with Django's CORS handling
