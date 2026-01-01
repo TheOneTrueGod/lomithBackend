@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_PATH="$PROJECT_DIR/venv"
 BRANCH="main"
-SERVICE_NAME="django-backend"  # Change this to your systemd service name if using systemd
+SERVICE_NAME="lomith-backend"  # Change this to your systemd service name if using systemd
 
 echo -e "${GREEN}Starting deployment...${NC}"
 
