@@ -149,6 +149,9 @@ SIMPLE_JWT = {
 }
 
 # CORS Settings
+import os
+
+# Development origins
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
@@ -156,5 +159,26 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-# For development only - allows all origins (NOT for production!)
-# CORS_ALLOW_ALL_ORIGINS = True
+# Add production frontend URL from environment variable if set
+FRONTEND_URL = os.environ.get('FRONTEND_URL')
+if FRONTEND_URL:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
+
+# Allow credentials for authenticated requests
+CORS_ALLOW_CREDENTIALS = True
+
+# Additional CORS settings
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# For Vercel deployment: vercel.json handles CORS headers at the edge
+# This Django CORS config is a fallback and for local development
