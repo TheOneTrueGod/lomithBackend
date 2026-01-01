@@ -5,29 +5,8 @@ This file serves as the handler for all requests to the Django app on Vercel.
 Vercel's Python runtime provides a 'vercel' module with Request and Response classes.
 This handler adapts Vercel's request format to Django's WSGI interface.
 """
-import os
-import sys
-from pathlib import Path
-
-# Add project root to Python path
-BASE_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(BASE_DIR))
-
-# Don't set Django settings or import Django at module level
-# This avoids issues with Vercel's runtime inspection
-
-# Lazy load Django WSGI application to avoid import-time issues
-_application = None
-
-def get_application():
-    """Lazy load Django WSGI application"""
-    global _application
-    if _application is None:
-        # Set Django settings before importing
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
-        from backend.wsgi import application as app
-        _application = app
-    return _application
+# Minimal module-level code to avoid Vercel runtime inspection issues
+# All imports and initialization moved inside handler function
 
 # Vercel Python runtime handler
 # Export handler as a callable that Vercel can invoke
@@ -37,9 +16,24 @@ def handler(request):
     Converts Vercel's request format to WSGI format and processes through Django.
     
     Note: The 'vercel' module is automatically provided by Vercel's Python runtime.
+    All imports are done inside the handler to avoid Vercel runtime inspection issues.
     """
-    from vercel import Response
+    import os
+    import sys
     import io
+    from pathlib import Path
+    from vercel import Response
+    
+    # Add project root to Python path (only once per function execution)
+    BASE_DIR = Path(__file__).resolve().parent
+    if str(BASE_DIR) not in sys.path:
+        sys.path.insert(0, str(BASE_DIR))
+    
+    # Lazy load Django WSGI application
+    if not hasattr(handler, '_application'):
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+        from backend.wsgi import application as app
+        handler._application = app
     
     # Extract request details
     method = request.method
@@ -95,9 +89,9 @@ def handler(request):
         response_data['status'] = int(status.split()[0])
         response_data['headers'] = dict(response_headers)
     
-    # Call Django WSGI application (lazy loaded)
+    # Call Django WSGI application
     try:
-        app = get_application()
+        app = handler._application
         result = app(environ, start_response)
         response_data['body'] = b''.join(result)
     except Exception as e:
