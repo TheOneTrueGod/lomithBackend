@@ -7,3 +7,18 @@ __pycache__/
 # Database backups
 db_backups/
 *.sqlite3.backup
+
+# Environment variables
+.env.local
+.env.production
+
+# Static files (collected in production)
+staticfiles/
+static/
+
+# Media files (user uploads)
+media/
+
+# Logs
+logs/
+*.log

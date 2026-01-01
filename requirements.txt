@@ -4,3 +4,6 @@ djangorestframework-simplejwt==5.3.0
 django-cors-headers==4.3.1
 setuptools<81
 
+# Production server
+gunicorn==21.2.0
+
