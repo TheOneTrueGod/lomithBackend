@@ -3,3 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+
+# Database backups
+db_backups/
+*.sqlite3.backup
