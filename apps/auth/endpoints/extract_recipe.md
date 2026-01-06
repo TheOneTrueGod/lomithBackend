@@ -1,0 +1,6 @@
+POST /api/ai-integrations/{id}/extract-recipe/
+Extract recipe information from a website URL using the specified AI integration.
+**Authentication**: Requires JWT Bearer token in Authorization header: `Authorization: Bearer <access_token>`. Obtain token from `/api/login/` endpoint.
+**Request Params**: Path parameter - `id` (integer, required): The AI integration ID to use for extraction. Request body - `url` (string, required): The URL of the webpage containing the recipe to extract.
+**Response Params**: On success (200): Returns `{ title: string, description: string, prepTime: number, cookTime: number, servings: number, imageUrl: string | null, ingredients: Array<{ name: string, amount: string, unit: string }>, steps: Array<{ instructions: string, ingredients: Array<string> }>, tags: Array<string> }`. If no recipe found (200): Returns `{ error: "No recipe found on this page" }`. On error: Returns `{ error: string }` with status 400 (URL is required / Invalid URL format / AI integration is not active / AI integration has no API key configured), 401 (Authentication required. Please log in again.), 404 (AI integration not found), or 500 (Failed to extract recipe: <error message> / Failed to parse AI response: <error message> / Invalid recipe data: <error message> / An unexpected error occurred: <error message>).
+
