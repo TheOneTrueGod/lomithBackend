@@ -15,6 +15,7 @@ from rest_framework import status
 from django.conf import settings
 
 from apps.auth.models import AIIntegration
+import google.generativeai as genai
 
 
 def _validate_url(url):
@@ -135,19 +136,40 @@ def _call_anthropic_api(api_key, model, base_url, prompt):
         "anthropic-version": "2023-06-01"
     }
     
+    # Anthropic API accepts content as either a string or an array of content blocks
+    # Using array format for better compatibility
     body = {
         "model": model,
         "max_tokens": 4096,
         "messages": [
             {
                 "role": "user",
-                "content": prompt
+                "content": [
+                    {
+                        "type": "text",
+                        "text": prompt
+                    }
+                ]
             }
         ]
     }
     
     response = requests.post(url, headers=headers, json=body, timeout=60)
-    response.raise_for_status()
+    
+    # Better error handling to see the actual error message
+    if response.status_code != 200:
+        try:
+            error_data = response.json()
+            error_message = error_data.get('error', {})
+            if isinstance(error_message, dict):
+                error_detail = error_message.get('message', str(error_message))
+                error_type = error_message.get('type', 'unknown')
+                raise Exception(f"Anthropic API error ({error_type}): {error_detail}")
+            else:
+                raise Exception(f"Anthropic API error: {error_message}")
+        except (ValueError, KeyError):
+            # If we can't parse the error, include the raw response
+            raise Exception(f"Anthropic API error (HTTP {response.status_code}): {response.text[:500]}")
     
     data = response.json()
     return data["content"][0]["text"]
@@ -155,42 +177,27 @@ def _call_anthropic_api(api_key, model, base_url, prompt):
 
 def _call_google_api(api_key, model, base_url, prompt):
     """Call Google API."""
-    if base_url:
-        # If base_url is provided, ensure it includes the model and endpoint
-        if f"{model}:generateContent" in base_url:
-            url = base_url
-        elif base_url.endswith('/'):
-            url = f"{base_url}v1beta/models/{model}:generateContent"
-        else:
-            url = f"{base_url}/v1beta/models/{model}:generateContent"
-    else:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    # Configure the API key
+    genai.configure(api_key=api_key)
     
-    headers = {
-        "Content-Type": "application/json"
-    }
+    # Use the provided model or default to gemini-2.5-flash
+    # Note: gemini-pro is deprecated. Use gemini-2.5-flash, gemini-2.5-pro, or gemini-pro-latest
+    model_name = model if model else "gemini-2.5-flash"
     
-    body = {
-        "contents": [
-            {
-                "parts": [
-                    {
-                        "text": prompt
-                    }
-                ]
-            }
-        ],
-        "generationConfig": {
+    # Create the generative model
+    generative_model = genai.GenerativeModel(
+        model_name=model_name,
+        generation_config={
             "temperature": 0.3,
             "response_mime_type": "application/json"
         }
-    }
+    )
     
-    response = requests.post(url, headers=headers, json=body, timeout=60)
-    response.raise_for_status()
+    # Generate content
+    response = generative_model.generate_content(prompt)
     
-    data = response.json()
-    return data["candidates"][0]["content"]["parts"][0]["text"]
+    # Return the text content
+    return response.text
 
 
 def _call_ai_provider(integration, prompt):

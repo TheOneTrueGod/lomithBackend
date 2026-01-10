@@ -103,7 +103,7 @@ def get_default_model(provider: str) -> str:
     defaults = {
         'openai': 'gpt-4',
         'anthropic': 'claude-3-opus',
-        'google': 'gemini-pro',
+        'google': 'gemini-2.5-flash',  # Updated: gemini-pro is deprecated
     }
     
     provider_lower = provider.lower() if provider else ''
